@@ -20,7 +20,7 @@ epochs=mne.io.read_epochs_eeglab(fr"C:\Users\sferna21\OneDrive - Kennesaw State 
 print(f"{len(epochs)}\n") #prints how many total events occured in the dataset
 
 
-
+#added comment
 
 
 #— — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥   

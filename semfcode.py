@@ -24,19 +24,19 @@ print(f"{len(epochs)}\n") #prints how many total events occured in the dataset
 
 
 #— — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥   
-'''
-def get_data(orig_data):
-    my_data=orig_data[7,7,:] 
-    my_data2=orig_data[7,8,:]
-    my_data3=orig_data[7,9,:]
-    my_data4=orig_data[7,10,:]
+
+
+my_data=epochs._data[7,7,:] 
+my_data2=epochs._data[7,8,:]
+my_data3=epochs._data[7,9,:]
+my_data4=epochs._data[7,10,:]
     
-    return my_data, my_data2,my_data3,my_data4
-'''
+
+
 
 
 # #epochs._data[1, 2, 3]: 1- nth event out of total events, 2- channel(s) we would like to isolate, 3- datapoints we would like to include (in this case, a total of 2000 for each event)
-my_data, my_data2,my_data3,my_data4=get_data(epochs.data)
+
 
 fig,axs=plt.subplots(2,2) #"fig" is the overall figure/canvas, "axs" is a 2D Numpy array, "plt.subplots(nr, mc)" creates an n-row by m-column grid of subplots
 

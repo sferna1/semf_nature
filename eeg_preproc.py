@@ -18,7 +18,7 @@ for i, (onset, duration, description) in enumerate(zip(raw.annotations.onset,
 #fast ICA from sklearn (algorithm) to decompose the signal into a number of components (10-20 range of components)
 #raw.pick_types(eeg=True) #skips EOG, ECG
 data = raw.get_data()
-print(data.shape)
+print(data.shape) 
 X = raw.get_data().T #shape:(n_times, n_channels)
 print(X.shape)
 components = 10
@@ -50,14 +50,22 @@ plt.figure(figsize=(10, 6))
 sns.heatmap(df_corr, annot=True, cmap='coolwarm', center=0)
 plt.title("Correlation Between ICA Components and EEG Channels")
 plt.tight_layout()
-plt.show()
+
 #have ICs that satisfy the above threshold eliminated
-raw_est_clean= raw_est.copy()
+raw_est_clean= raw_est.copy() #creates a copy of the raw w estimated components
 raw_est_clean[:, bad_ic_indices] = 0
 X_denoised = raw_est_clean @ raw_ica.mixing_.T #reconstruct the cleaned signal using the ICA mixing matrix
 raw._data[:, :] = X_denoised.T 
 #apply new ICA on your data, like an inverse transform, this yeilds new data that resembles the orginal data in shape but different in values
+times = raw.times
 
+
+
+plt.figure(figsize=(15, 10))
+plt.plot(times, data[5, :], label='Original', alpha=0.6)
+plt.plot(times, X_denoised.T[5, :], label='Cleaned', alpha=0.8)
+plt.tight_layout()
+plt.show()
 
 
 

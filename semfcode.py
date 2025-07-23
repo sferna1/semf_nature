@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd 
 import scipy as sci
+import seaborn as sns
 from scipy.fft import rfft, rfftfreq          # For Fast Fourier Transform (FFT)
 from scipy.signal import stft, welch            # For Short-Time Fourier Transform and Power Spectral Density
 
@@ -17,14 +18,125 @@ from scipy.linalg.blas import ddot
 import csv 
 
  #— — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —  ♥  — — — — — — — — — — — — — — — — — — —
-eeg = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\eeg sample\cleaned_eeg\1_eeg.fif")
-gsr = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\gsr sample\cleaned_gsr\1_gsr.fif")
-emg = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\emg sample\cleaned_emg\1_emg.fif")
-ecg = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\ecg sample\cleaned_ecg\1_ecg.fif")
 
 
+eeg_data = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\eeg sample\cleaned_eeg\1_eeg.fif")
+gsr_data = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\gsr sample\cleaned_gsr\1_gsr.fif")
+emg_data = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\emg sample\cleaned_emg\1_emg.fif")
+ecg_data = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\ecg sample\cleaned_ecg\1_ecg.fif")
+
+eeg = eeg_data.get_data()
+gsr = gsr_data.get_data()
+emg = emg_data.get_data()
+ecg = ecg_data.get_data()
+
+# .to_data_frame() returns metadata as dataframe
+eeg_m = eeg_data.to_data_frame()
+print(eeg_m['time'].unique()[:100]) #prints the first 100 epochs that are unique
+print(eeg_m['condition'].unique()[:5])#prints all the unique event IDs that exist
+print(eeg_m['condition'].nunique()) #prints the number of unique event IDs that  exist
 
 
+print(eeg.shape)
+print(gsr.shape)
+print(emg.shape)
+print(ecg.shape)
+
+eeg_avg = np.average(eeg, axis=(1,2)) 
+gsr_avg = np.average(gsr, axis=(1,2))
+emg_avg = np.average(emg, axis=(1,2))
+ecg_avg = np.average(ecg, axis=(1,2))
+
+eeg_n = eeg_m.to_numpy()
+eeg_ch_mean = np.mean(eeg_n[:, 3:], axis = 1 )
+eeg_ch_mean = np.mean(eeg_ch_mean.reshape(-1, 2000), axis = 1)
+print(eeg_ch_mean.shape)
+
+eeg_epochs = eeg_n[:,2]
+eeg_epochs = eeg_epochs[::2000]
+print(eeg_epochs.shape)
+
+eeg_eventId = eeg_n[:,1]
+eeg_eventId = eeg_eventId[::2000]
+print(eeg_eventId.shape)
+
+gsr_m = gsr_data.to_data_frame()
+gsr_n = gsr_m.to_numpy()
+gsr_ch_mean = gsr_n[:, 3]
+print(gsr_ch_mean.shape)
+gsr_ch_mean = np.mean(gsr_ch_mean.reshape(-1, 2000), axis = 1)
+print(gsr_ch_mean.shape)
+
+gsr_epochs = gsr_n[:, 2]
+gsr_epochs = gsr_epochs[::2000]
+print(gsr_epochs.shape)
+
+gsr_eventId = gsr_n[:,1]
+gsr_eventId = gsr_eventId[::2000]
+print(gsr_eventId.shape)
+
+emg_m = emg_data.to_data_frame()
+emg_n = emg_m.to_numpy()
+emg_ch_mean = np.mean(emg_n[:, 3:], axis = 1)
+emg_ch_mean = np.mean(emg_ch_mean.reshape(-1, 2000), axis = 1)
+print(emg_ch_mean.shape)
+
+emg_epochs = emg_n[:, 2]
+emg_epochs = emg_epochs[::2000]
+print(emg_epochs.shape)
+
+emg_eventId = emg_n[:, 1]
+emg_eventId = emg_eventId[::2000]
+print(emg_eventId.shape)
+
+ecg_m = ecg_data.to_data_frame()
+ecg_n = ecg_m.to_numpy()
+ecg_ch_mean = ecg_n[:, 3]
+ecg_ch_mean = np.mean(ecg_ch_mean.reshape(-1, 2000), axis = 1)
+print(ecg_ch_mean.shape)
+
+ecg_epochs = ecg_n[:, 3]
+ecg_epochs = ecg_epochs[::2000]
+print(ecg_epochs.shape)
+
+ecg_eventId = ecg_n[:, 1]
+ecg_eventId = ecg_eventId[::2000]
+print(ecg_eventId.shape)
+
+eeg_gsr_epoch = np.array_equal(eeg_epochs, gsr_epochs)
+eeg_gsr_eventId = np.array_equal(eeg_eventId, gsr_eventId)
+
+
+eeg_emg_epoch = np.array_equiv(eeg_epochs, emg_epochs)
+eeg_emg_eventId = np.array_equiv(eeg_eventId, emg_eventId)
+
+
+eeg_ecg_epoch = np.array_equiv(eeg_epochs, ecg_epochs)
+eeg_ecg_eventId = np.array_equiv(eeg_eventId, ecg_eventId)
+
+
+diff1 = eeg_epochs == gsr_epochs
+diff2 = eeg_epochs == emg_epochs
+diff3 = eeg_epochs == ecg_epochs
+print(diff1)
+print(diff2)
+print(diff3)
+
+avg_array = np.column_stack((eeg_epochs, gsr_epochs))
+avg_array = np.column_stack((avg_array, emg_epochs))
+avg_array = np.column_stack((avg_array, eeg_eventId))
+avg_array = np.column_stack((avg_array, eeg_ch_mean))
+avg_array = np.column_stack((avg_array, gsr_ch_mean))
+avg_array = np.column_stack((avg_array, emg_ch_mean))
+
+avg_array = pd.DataFrame(avg_array, columns=['EEG epochs', 'GSR epochs', 'EMG epochs', 'EEG event ID', 'EEG ch mean', 'GSR ch mean', 'EMG ch mean'])
+avg_array = avg_array.drop(avg_array[(avg_array['EEG epochs'] != avg_array['GSR epochs']) | (avg_array['EEG epochs'] != avg_array['EMG epochs'])].index)
+avg_array = avg_array.drop(['GSR epochs', 'EMG epochs'], axis = 1)
+
+avg_array.to_csv(r"C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\dataframes\avg_array.csv", index = False)
+
+
+stop=1
 
 
 
@@ -145,4 +257,3 @@ ecg = mne.read_epochs(fr"C:\Users\sferna21\OneDrive - Kennesaw State University\
 
 
 # plt.show()
-stop=1

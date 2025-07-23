@@ -20,7 +20,7 @@ threshold = 0.7
 base_path = fr'C:\Users\sferna21\OneDrive - Kennesaw State University\Desktop\SEMF Project\eeg sample'
 #--Loop through the dataset
 for dataset_num in range(1, 31):
-   
+    epoch_store = {} #initializes once per subject
     for event_num in range(1, 5):
         label = labels[event_num - 1]
         event_ids = event_map[event_num]
@@ -67,13 +67,17 @@ for dataset_num in range(1, 31):
             print(f"No matching markers for {label} in subject {dataset_num}")
             continue
         #--Epoching 
-        epochs = mne.Epochs(raw, events, event_id=selected_event_id, tmin=-0.5, tmax=1.5, baseline=(-0.5, 0))
-
-        #--Saving
-        save_dir = os.path.join(base_path, "cleaned_epochs", label)
+        epochs = mne.Epochs(raw, events, event_id=selected_event_id, tmin=-0.5, tmax=1.499, baseline=(-0.5, 0))  #cannot be exactly 1.5 because mne automatically adds an extra data point for the edges
+        
+        epoch_store[label] = epochs
+        
+    #--Concatenate and save
+    if len(epoch_store) == 4:
+        combined_epochs = mne.concatenate_epochs([epoch_store[l] for l in labels])
+        save_dir = os.path.join(base_path, "cleaned_eeg")
         os.makedirs(save_dir, exist_ok=True)
-        save_name = f'{dataset_num}_{label}_cleaned.fif'
-        epochs.save(os.path.join(save_dir, save_name), overwrite=True)
+        save_name = f'{dataset_num}_eeg.fif'
+        combined_epochs.save(os.path.join(save_dir, save_name), overwrite=True)
 
 
 
